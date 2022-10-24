@@ -85,7 +85,7 @@ pub fn printlnc(txt: &'static str, color: ConsoleColor) {
     println!("{}", format(txt, color));
 }
 
-/// Print `ColoredText` with decoratin and no new line.
+/// Print `ColoredText` with decoration and no new line.
 /// ```
 /// use rust_ark::console::*;
 /// print_deco("Hello", ConsoleColor::Black, ConsoleDecoration::Underline);
@@ -94,7 +94,7 @@ pub fn print_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecoratio
     print!("{}", format_deco(txt, color, back))
 }
 
-/// Print `ColoredText` with decoratin and new line.
+/// Print `ColoredText` with decoration and new line.
 /// ```
 /// use rust_ark::console::*;
 /// println_deco("Hello", ConsoleColor::Black, ConsoleDecoration::Underline);

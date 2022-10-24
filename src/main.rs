@@ -1,5 +1,8 @@
 use rust_ark::console::{clear, estimate_size, printc, printlnc, ConsoleColor};
 
+#[cfg(test)]
+mod tests;
+
 /// Main function.
 /// Start rust-ark process.
 /// This application is based on console and cross-platform.
