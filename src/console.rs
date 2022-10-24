@@ -1,6 +1,9 @@
+use core::panic;
+use std::io;
+use std::io::prelude::*;
+
 use colored::{ColoredString, Colorize};
 
-#[allow(dead_code)]
 pub enum ConsoleColor {
     Black,
     Red,
@@ -10,7 +13,6 @@ pub enum ConsoleColor {
     Purple,
 }
 
-#[allow(dead_code)]
 pub enum ConsoleDecoration {
     Underline,
     StrikeThrougb,
@@ -18,7 +20,6 @@ pub enum ConsoleDecoration {
     None,
 }
 
-#[allow(dead_code)]
 pub fn format(txt: &'static str, color: ConsoleColor) -> ColoredString {
     match color {
         ConsoleColor::Black => format!("{txt}").black(),
@@ -30,7 +31,6 @@ pub fn format(txt: &'static str, color: ConsoleColor) -> ColoredString {
     }
 }
 
-#[allow(dead_code)]
 pub fn format_deco(
     txt: &'static str,
     color: ConsoleColor,
@@ -46,22 +46,65 @@ pub fn format_deco(
     }
 }
 
-#[allow(dead_code)]
 pub fn printc(txt: &'static str, color: ConsoleColor) {
     print!("{}", format(txt, color));
 }
 
-#[allow(dead_code)]
 pub fn printlnc(txt: &'static str, color: ConsoleColor) {
     println!("{}", format(txt, color));
 }
 
-#[allow(dead_code)]
 pub fn print_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecoration) {
     print!("{}", format_deco(txt, color, back))
 }
 
-#[allow(dead_code)]
 pub fn println_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecoration) {
     println!("{}", format_deco(txt, color, back))
+}
+
+pub fn clear() {
+    print!("\x1B[2J\x1B[1;1H");
+}
+
+fn pause() {
+    let mut stdin = io::stdin();
+    let mut stdout = io::stdout();
+
+    // We want the cursor to stay at the end of the line, so we print without a newline and flush manually.
+    write!(stdout, "\n\n아무 키를 눌러 계속하세요...").unwrap();
+    stdout.flush().unwrap();
+
+    // Read a single byte and discard
+    let _ = stdin.read(&mut [0u8]).unwrap();
+}
+
+pub fn estimate_size() -> (u16, u16) {
+    let termsize::Size {
+        rows: height,
+        cols: width,
+    } = match termsize::get() {
+        Some(r) => r,
+        None => {
+            eprintln!("콘솔의 가로와 세로 사이즈를 계산할 수 없습니다.");
+            panic!("이 터미널이 필요 기능을 지원하지 않습니다.")
+        }
+    };
+
+    if width < 128 {
+        println_deco(
+            "가로 길이가 너무 짧습니다.",
+            ConsoleColor::Red,
+            ConsoleDecoration::Underline,
+        );
+        pause();
+    } else if height < 32 {
+        println_deco(
+            "세로 길이가 너무 짧습니다.",
+            ConsoleColor::Red,
+            ConsoleDecoration::Underline,
+        );
+        pause();
+    }
+
+    (width, height)
 }
