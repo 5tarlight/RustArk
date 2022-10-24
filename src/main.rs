@@ -1,12 +1,16 @@
-use lib::console::{printc, printlnc};
+use rust_ark::console::{clear, estimate_size, printc, printlnc, ConsoleColor};
 
-pub mod lib;
+#[cfg(test)]
+mod tests;
 
+/// Main function.
+/// Start rust-ark process.
+/// This application is based on console and cross-platform.
+/// In some terminals, colored text may not be displayed properly.
 fn main() {
-    printc("Welcome to ", lib::console::ConsoleColor::Blue);
-    printlnc("Rust Ark", lib::console::ConsoleColor::Purple);
+    clear();
+    printc("Welcome to ", ConsoleColor::Blue);
+    printlnc("Rust Ark", ConsoleColor::Purple);
 
-    let termsize::Size { rows, cols } = termsize::get().unwrap();
-    println!("          width  height");
-    println!("termsize: {:4}    {:4}", cols, rows);
+    println!("{:?}", estimate_size());
 }
