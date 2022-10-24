@@ -1,3 +1,8 @@
+use lib::console::{printc, printlnc};
+
+pub mod lib;
+
 fn main() {
-    println!("Hello, world!");
+    printc("Welcome to ", lib::console::ConsoleColor::Blue);
+    printlnc("Rust Ark", lib::console::ConsoleColor::Purple);
 }
