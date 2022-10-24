@@ -4,6 +4,7 @@ use std::io::prelude::*;
 
 use colored::{ColoredString, Colorize};
 
+/// Color of colored text to be printed to console
 pub enum ConsoleColor {
     Black,
     Red,
@@ -13,6 +14,8 @@ pub enum ConsoleColor {
     Purple,
 }
 
+/// Decoration of text.
+/// Mixture of multiple decoration is not supported by console.
 pub enum ConsoleDecoration {
     Underline,
     StrikeThrougb,
@@ -20,6 +23,15 @@ pub enum ConsoleDecoration {
     None,
 }
 
+/// format `String` literal to `ColoredString`.
+///
+/// ```
+/// use rust_ark::console::*;
+/// use colored::Colorize;
+///
+/// let red = format("Hello", ConsoleColor::Red);
+/// assert_eq!(red, format!("Hello").red());
+/// ```
 pub fn format(txt: &'static str, color: ConsoleColor) -> ColoredString {
     match color {
         ConsoleColor::Black => format!("{txt}").black(),
@@ -31,6 +43,15 @@ pub fn format(txt: &'static str, color: ConsoleColor) -> ColoredString {
     }
 }
 
+/// format `String` literal to colored and decorated `ColoredString`.
+///
+/// ```
+/// use rust_ark::console::*;
+/// use colored::Colorize;
+///
+/// let red = format_deco("Hello", ConsoleColor::Red, ConsoleDecoration::Underline);
+/// assert_eq!(red, format!("Hello").red().underline());
+/// ```
 pub fn format_deco(
     txt: &'static str,
     color: ConsoleColor,
@@ -46,27 +67,51 @@ pub fn format_deco(
     }
 }
 
+/// Print `ColoredText` without new line.
+/// ```
+/// use rust_ark::console::*;
+/// printc("Hello", ConsoleColor::Black);
+/// ```
 pub fn printc(txt: &'static str, color: ConsoleColor) {
     print!("{}", format(txt, color));
 }
 
+/// Print `ColoredText` with new line.
+/// ```
+/// use rust_ark::console::*;
+/// printlnc("Hello", ConsoleColor::Black);
+/// ```
 pub fn printlnc(txt: &'static str, color: ConsoleColor) {
     println!("{}", format(txt, color));
 }
 
+/// Print `ColoredText` with decoratin and no new line.
+/// ```
+/// use rust_ark::console::*;
+/// print_deco("Hello", ConsoleColor::Black, ConsoleDecoration::Underline);
+/// ```
 pub fn print_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecoration) {
     print!("{}", format_deco(txt, color, back))
 }
 
+/// Print `ColoredText` with decoratin and new line.
+/// ```
+/// use rust_ark::console::*;
+/// println_deco("Hello", ConsoleColor::Black, ConsoleDecoration::Underline);
+/// ```
 pub fn println_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecoration) {
     println!("{}", format_deco(txt, color, back))
 }
 
+/// Clear console and move cursor to first index.
+/// In some environment, this may be broken.
 pub fn clear() {
     print!("\x1B[2J\x1B[1;1H");
 }
 
-fn pause() {
+/// Pause the process and wait for next key press.
+/// **This function freezes current thread**
+pub fn pause() {
     let mut stdin = io::stdin();
     let mut stdout = io::stdout();
 
@@ -78,6 +123,12 @@ fn pause() {
     let _ = stdin.read(&mut [0u8]).unwrap();
 }
 
+/// Get width and height of current console.
+/// Unit is word.
+/// Recommend using programming fonts (All widths of letter is same.)
+///
+/// # Panic
+/// If terminal do not support reading width and height of itself, This method will be paniced.
 pub fn estimate_size() -> (u16, u16) {
     let termsize::Size {
         rows: height,
