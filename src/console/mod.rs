@@ -4,6 +4,8 @@ use std::io::prelude::*;
 
 use colored::{ColoredString, Colorize};
 
+pub mod window;
+
 /// Color of colored text to be printed to console
 pub enum ConsoleColor {
     Black,
@@ -107,6 +109,16 @@ pub fn println_deco(txt: &'static str, color: ConsoleColor, back: ConsoleDecorat
 /// In some environment, this may be broken.
 pub fn clear() {
     print!("\x1B[2J\x1B[1;1H");
+}
+
+/// Pause without any printing.
+/// **This function freezes current thread**
+pub fn quiet_pause() {
+    let mut stdout = io::stdout();
+    stdout.flush().unwrap();
+
+    let mut stdin = io::stdin();
+    let _ = stdin.read(&mut [0u8]).unwrap();
 }
 
 /// Pause the process and wait for next key press.

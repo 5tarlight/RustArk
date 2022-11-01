@@ -1,4 +1,4 @@
-use rust_ark::console::{clear, estimate_size, printc, printlnc, ConsoleColor};
+use rust_ark::console::{clear, estimate_size, printc, printlnc, window::Window, ConsoleColor};
 
 #[cfg(test)]
 mod tests;
@@ -9,8 +9,11 @@ mod tests;
 /// In some terminals, colored text may not be displayed properly.
 fn main() {
     clear();
-    printc("Welcome to ", ConsoleColor::Blue);
-    printlnc("Rust Ark", ConsoleColor::Purple);
+    // printc("Welcome to ", ConsoleColor::Blue);
+    // printlnc("Rust Ark", ConsoleColor::Purple);
 
-    println!("{:?}", estimate_size());
+    let size = estimate_size();
+    let window = Window::new(size.0, size.1);
+
+    window.show();
 }
