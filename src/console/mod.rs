@@ -4,6 +4,7 @@ use std::io::prelude::*;
 
 use colored::{ColoredString, Colorize};
 
+pub mod tab;
 pub mod window;
 
 /// Color of colored text to be printed to console
