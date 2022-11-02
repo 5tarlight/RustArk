@@ -47,6 +47,7 @@ impl Window {
     // l : 108
     pub fn show(&mut self) {
         let mut index = 0;
+        let mut input = 0;
         self.refresh();
 
         loop {
@@ -56,6 +57,14 @@ impl Window {
             let required = headline.chars().count();
             if required > self.width as usize {
                 panic!("Width is too short!")
+            }
+
+            if input == 9 {
+                if index < self.tabs.len() - 1 {
+                    index = index + 1;
+                } else {
+                    index = 0;
+                }
             }
 
             for i in 0..self.height {
@@ -96,7 +105,7 @@ impl Window {
                 }
             }
 
-            read_ch();
+            input = read_ch();
         }
     }
 
