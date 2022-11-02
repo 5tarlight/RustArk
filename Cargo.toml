@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 colored = "2.0.0"
 termsize = "0.1"
+crossterm = "0.25.0"
+termios = "0.3.3"
