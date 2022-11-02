@@ -1,4 +1,4 @@
-use rust_ark::console::{clear, estimate_size, printc, printlnc, window::Window, ConsoleColor};
+use rust_ark::console::{clear, estimate_size, window::Window};
 
 #[cfg(test)]
 mod tests;
@@ -13,7 +13,9 @@ fn main() {
     // printlnc("Rust Ark", ConsoleColor::Purple);
 
     let size = estimate_size();
-    let window = Window::new(size.0, size.1);
+    let mut window = Window::new(size.0, size.1);
 
+    window.add_tab(String::from("Main"));
+    window.add_tab(String::from("Inventory"));
     window.show();
 }
