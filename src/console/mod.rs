@@ -3,6 +3,10 @@ use std::io;
 use std::io::prelude::*;
 
 use colored::{ColoredString, Colorize};
+use termios::{tcsetattr, Termios, ECHO, ICANON, TCSANOW};
+
+pub mod tab;
+pub mod window;
 
 /// Color of colored text to be printed to console
 pub enum ConsoleColor {
@@ -109,6 +113,16 @@ pub fn clear() {
     print!("\x1B[2J\x1B[1;1H");
 }
 
+/// Pause without any printing.
+/// **This function freezes current thread**
+pub fn quiet_pause() {
+    let mut stdout = io::stdout();
+    stdout.flush().unwrap();
+
+    let mut stdin = io::stdin();
+    let _ = stdin.read(&mut [0u8]).unwrap();
+}
+
 /// Pause the process and wait for next key press.
 /// **This function freezes current thread**
 pub fn pause() {
@@ -158,4 +172,22 @@ pub fn estimate_size() -> (u16, u16) {
     }
 
     (width, height)
+}
+
+pub fn read_ch() -> u8 {
+    let stdin = 0; // couldn't get std::os::unix::io::FromRawFd to work
+                   // on /dev/stdin or /dev/tty
+    let termios = Termios::from_fd(stdin).unwrap();
+    let mut new_termios = termios.clone(); // make a mutable copy of termios
+                                           // that we will modify
+    new_termios.c_lflag &= !(ICANON | ECHO); // no echo and canonical mode
+    tcsetattr(stdin, TCSANOW, &mut new_termios).unwrap();
+    let stdout = io::stdout();
+    let mut reader = io::stdin();
+    let mut buffer = [0; 1]; // read exactly one byte
+    stdout.lock().flush().unwrap();
+    reader.read_exact(&mut buffer).unwrap();
+    tcsetattr(stdin, TCSANOW, &termios).unwrap(); // reset the stdin to
+
+    buffer[0]
 }
