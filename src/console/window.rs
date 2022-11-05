@@ -1,8 +1,5 @@
 use core::panic;
-use std::{
-    cmp::{self, max_by},
-    vec,
-};
+use std::{cmp::max_by, vec};
 
 use super::{clear, estimate_size, read_ch, tab::Tab};
 
@@ -93,7 +90,6 @@ impl Window {
             }
 
             let content = self.tabs[index].build();
-            let content_height = cmp::min(self.height - 2, content.len() as u16);
 
             for i in 0..self.height {
                 for j in 0..self.width {
