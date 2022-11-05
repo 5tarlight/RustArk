@@ -155,22 +155,6 @@ pub fn estimate_size() -> (u16, u16) {
         }
     };
 
-    if width < 128 {
-        println_deco(
-            "가로 길이가 너무 짧습니다.",
-            ConsoleColor::Red,
-            ConsoleDecoration::Underline,
-        );
-        pause();
-    } else if height < 32 {
-        println_deco(
-            "세로 길이가 너무 짧습니다.",
-            ConsoleColor::Red,
-            ConsoleDecoration::Underline,
-        );
-        pause();
-    }
-
     (width, height)
 }
 

@@ -1,5 +1,8 @@
 use core::panic;
-use std::{cmp::min_by, vec};
+use std::{
+    cmp::{self, max_by},
+    vec,
+};
 
 use super::{clear, estimate_size, read_ch, tab::Tab};
 
@@ -54,20 +57,51 @@ impl Window {
     // j: 106
     // k : 107
     // l : 108
+    // q : 113
     /// Print content of window fit to console.
     /// Switch tab with "tab" key and move with "hjkl".
     /// Reading arrow keys is not supported.
     pub fn show(&mut self) {
-        let mut index = 0;
-        let mut input = 0;
+        let mut index: usize = 0;
+        let mut scroll: usize = 0;
+        let mut input: u8 = 0;
+        let content_height = self.height - 2;
         self.refresh();
 
+        let mut content: Vec<String> = Vec::new();
+
         loop {
-            clear();
+            // clear();
+            // println!("{}", input);
+            if input == 9 {
+                if index < self.tabs.len() - 1 {
+                    index = index + 1;
+                } else {
+                    index = 0;
+                }
+                scroll = 0;
+            } else if input == 113 {
+                break;
+            } else if input == 106 {
+                if (scroll as isize) < (content.len() as isize) - (self.height as isize) + 3 {
+                    scroll = scroll + 1;
+                }
+            } else if input == 107 {
+                if scroll > 0 {
+                    scroll = scroll - 1;
+                }
+            }
+
+            content = self.tabs[index].build();
+
+            let div = cmp::max(content.len() as isize - self.height as isize, 0) as usize + 3;
+            let percent = scroll as f64 / div as f64;
+            let position = (content_height as f64 * percent) as usize + 1;
+            let position = cmp::min(position, content_height as usize);
 
             let headline = self.get_headline(index);
-            let required_w = headline.chars().count();
-            let required_w = min_by(required_w, 2 as usize, |x: &usize, y: &usize| x.cmp(y));
+            let headline_len = headline.chars().count();
+            let required_w = max_by(headline_len, 2 as usize, |x: &usize, y: &usize| x.cmp(y));
             if required_w > self.width as usize {
                 panic!("Width is too short!")
             }
@@ -75,14 +109,6 @@ impl Window {
             let required_h = 2;
             if required_h > self.height as usize {
                 panic!("Height is too short!")
-            }
-
-            if input == 9 {
-                if index < self.tabs.len() - 1 {
-                    index = index + 1;
-                } else {
-                    index = 0;
-                }
             }
 
             for i in 0..self.height {
@@ -93,7 +119,7 @@ impl Window {
                             print!("┌")
                         } else if j == self.width - 1 {
                             print!("┐")
-                        } else if (j as usize) <= required_w {
+                        } else if (j as usize) <= headline_len {
                             // title
                             print!("{}", headline.chars().nth((j - 1) as usize).unwrap());
                         } else {
@@ -111,9 +137,22 @@ impl Window {
                     } else {
                         // rest line
                         if j == 0 || j == self.width - 1 {
-                            print!("│")
+                            // ┃ │
+                            if i as usize == position && j != 0 {
+                                print!("❚")
+                            } else {
+                                print!("│")
+                            }
                         } else {
-                            print!(" ")
+                            if let Some(line) = content.get((i - 1 + scroll as u16) as usize) {
+                                if let Some(ch) = line.chars().nth((j - 1) as usize) {
+                                    print!("{}", ch);
+                                } else {
+                                    print!(" ");
+                                }
+                            } else {
+                                print!(" ");
+                            }
                         }
                     }
                 }
