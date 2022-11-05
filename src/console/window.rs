@@ -68,10 +68,10 @@ impl Window {
         let content_height = self.height - 2;
         self.refresh();
 
-        loop {
-            clear();
-            let content = self.tabs[index].build();
+        let mut content: Vec<String> = Vec::new();
 
+        loop {
+            // clear();
             // println!("{}", input);
             if input == 9 {
                 if index < self.tabs.len() - 1 {
@@ -83,7 +83,7 @@ impl Window {
             } else if input == 113 {
                 break;
             } else if input == 106 {
-                if scroll < content.len() - self.height as usize + 3 {
+                if (scroll as isize) < (content.len() as isize) - (self.height as isize) + 3 {
                     scroll = scroll + 1;
                 }
             } else if input == 107 {
@@ -92,7 +92,10 @@ impl Window {
                 }
             }
 
-            let percent = scroll as f64 / (content.len() - self.height as usize + 3) as f64;
+            content = self.tabs[index].build();
+
+            let div = cmp::max(content.len() as isize - self.height as isize, 0) as usize + 3;
+            let percent = scroll as f64 / div as f64;
             let position = (content_height as f64 * percent) as usize + 1;
             let position = cmp::min(position, content_height as usize);
 
