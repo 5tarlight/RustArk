@@ -1,5 +1,8 @@
 use core::panic;
-use std::{cmp::min_by, vec};
+use std::{
+    cmp::{self, max_by},
+    vec,
+};
 
 use super::{clear, estimate_size, read_ch, tab::Tab};
 
@@ -65,9 +68,17 @@ impl Window {
         loop {
             clear();
 
+            if input == 9 {
+                if index < self.tabs.len() - 1 {
+                    index = index + 1;
+                } else {
+                    index = 0;
+                }
+            }
+
             let headline = self.get_headline(index);
-            let required_w = headline.chars().count();
-            let required_w = min_by(required_w, 2 as usize, |x: &usize, y: &usize| x.cmp(y));
+            let headline_len = headline.chars().count();
+            let required_w = max_by(headline_len, 2 as usize, |x: &usize, y: &usize| x.cmp(y));
             if required_w > self.width as usize {
                 panic!("Width is too short!")
             }
@@ -77,13 +88,8 @@ impl Window {
                 panic!("Height is too short!")
             }
 
-            if input == 9 {
-                if index < self.tabs.len() - 1 {
-                    index = index + 1;
-                } else {
-                    index = 0;
-                }
-            }
+            let content = self.tabs[index].build();
+            let content_height = cmp::min(self.height - 2, content.len() as u16);
 
             for i in 0..self.height {
                 for j in 0..self.width {
@@ -93,7 +99,7 @@ impl Window {
                             print!("┌")
                         } else if j == self.width - 1 {
                             print!("┐")
-                        } else if (j as usize) <= required_w {
+                        } else if (j as usize) <= headline_len {
                             // title
                             print!("{}", headline.chars().nth((j - 1) as usize).unwrap());
                         } else {
@@ -113,7 +119,15 @@ impl Window {
                         if j == 0 || j == self.width - 1 {
                             print!("│")
                         } else {
-                            print!(" ")
+                            if let Some(line) = content.get((i - 1) as usize) {
+                                if let Some(ch) = line.chars().nth((j - 1) as usize) {
+                                    print!("{}", ch);
+                                } else {
+                                    print!(" ");
+                                }
+                            } else {
+                                print!(" ");
+                            }
                         }
                     }
                 }
