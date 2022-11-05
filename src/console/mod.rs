@@ -174,6 +174,14 @@ pub fn estimate_size() -> (u16, u16) {
     (width, height)
 }
 
+/// Read keyboard from console.
+/// This method will pause current thread.
+/// Reading key input from console may not be supported in some environments.
+/// UNIX shell is recommended.
+/// This supports only 0~255 keys.
+/// Some unicodes may not be read properly.
+/// For instace, arrow keys don't differ.
+/// All arrow keys have same keycode.
 pub fn read_ch() -> u8 {
     let stdin = 0; // couldn't get std::os::unix::io::FromRawFd to work
                    // on /dev/stdin or /dev/tty

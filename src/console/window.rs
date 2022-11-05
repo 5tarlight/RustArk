@@ -1,14 +1,18 @@
-use std::vec;
+use core::panic;
+use std::{cmp::min_by, vec};
 
-use super::{clear, estimate_size, pause, quiet_pause, read_ch, tab::Tab};
+use super::{clear, estimate_size, read_ch, tab::Tab};
 
+/// Console CUI manager.
+/// calculate console's width and height and handle with tabs.
 pub struct Window {
     pub width: u16,
     pub height: u16,
-    tabs: Vec<Tab>,
+    pub tabs: Vec<Tab>,
 }
 
 impl Window {
+    /// Create new window object with predefined width and height.
     pub fn new(w: u16, h: u16) -> Self {
         Self {
             width: w,
@@ -17,12 +21,17 @@ impl Window {
         }
     }
 
+    /// Automatically refresh width and height of console.
+    /// This will not refresh cui but, internal varaibles.
     pub fn refresh(&mut self) {
         let size = estimate_size();
         self.width = size.0;
         self.height = size.1;
     }
 
+    /// Build headline which lists titles of resistered tabs.
+    /// Length of content is fitted to console's width
+    /// Not sufficient width may cause visual problem.
     fn get_headline(&self, index: usize) -> String {
         let names: Vec<String> = self
             .tabs
@@ -45,6 +54,9 @@ impl Window {
     // j: 106
     // k : 107
     // l : 108
+    /// Print content of window fit to console.
+    /// Switch tab with "tab" key and move with "hjkl".
+    /// Reading arrow keys is not supported.
     pub fn show(&mut self) {
         let mut index = 0;
         let mut input = 0;
@@ -54,9 +66,15 @@ impl Window {
             clear();
 
             let headline = self.get_headline(index);
-            let required = headline.chars().count();
-            if required > self.width as usize {
+            let required_w = headline.chars().count();
+            let required_w = min_by(required_w, 2 as usize, |x: &usize, y: &usize| x.cmp(y));
+            if required_w > self.width as usize {
                 panic!("Width is too short!")
+            }
+
+            let required_h = 2;
+            if required_h > self.height as usize {
+                panic!("Height is too short!")
             }
 
             if input == 9 {
@@ -75,7 +93,7 @@ impl Window {
                             print!("┌")
                         } else if j == self.width - 1 {
                             print!("┐")
-                        } else if (j as usize) <= required {
+                        } else if (j as usize) <= required_w {
                             // title
                             print!("{}", headline.chars().nth((j - 1) as usize).unwrap());
                         } else {
@@ -109,6 +127,8 @@ impl Window {
         }
     }
 
+    /// Add new empty tab with name.
+    /// This will not automatically re-draw CUI.
     pub fn add_tab(&mut self, name: String) {
         self.tabs.push(Tab::new(name, self));
     }
