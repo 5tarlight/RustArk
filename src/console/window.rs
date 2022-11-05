@@ -1,5 +1,8 @@
 use core::panic;
-use std::{cmp::max_by, vec};
+use std::{
+    cmp::{self, max_by},
+    vec,
+};
 
 use super::{clear, estimate_size, read_ch, tab::Tab};
 
@@ -62,6 +65,7 @@ impl Window {
         let mut index: usize = 0;
         let mut scroll: usize = 0;
         let mut input: u8 = 0;
+        let content_height = self.height - 2;
         self.refresh();
 
         loop {
@@ -87,6 +91,10 @@ impl Window {
                     scroll = scroll - 1;
                 }
             }
+
+            let percent = scroll as f64 / (content.len() - self.height as usize + 3) as f64;
+            let position = (content_height as f64 * percent) as usize + 1;
+            let position = cmp::min(position, content_height as usize);
 
             let headline = self.get_headline(index);
             let headline_len = headline.chars().count();
@@ -126,7 +134,12 @@ impl Window {
                     } else {
                         // rest line
                         if j == 0 || j == self.width - 1 {
-                            print!("│")
+                            // ┃ │
+                            if i as usize == position && j != 0 {
+                                print!("❚")
+                            } else {
+                                print!("│")
+                            }
                         } else {
                             if let Some(line) = content.get((i - 1 + scroll as u16) as usize) {
                                 if let Some(ch) = line.chars().nth((j - 1) as usize) {
