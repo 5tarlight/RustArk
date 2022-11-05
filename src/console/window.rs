@@ -57,6 +57,7 @@ impl Window {
     // j: 106
     // k : 107
     // l : 108
+    // q : 113
     /// Print content of window fit to console.
     /// Switch tab with "tab" key and move with "hjkl".
     /// Reading arrow keys is not supported.
@@ -68,12 +69,15 @@ impl Window {
         loop {
             clear();
 
+            // println!("{}", input);
             if input == 9 {
                 if index < self.tabs.len() - 1 {
                     index = index + 1;
                 } else {
                     index = 0;
                 }
+            } else if input == 113 {
+                break;
             }
 
             let headline = self.get_headline(index);
