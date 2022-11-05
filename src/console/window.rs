@@ -59,12 +59,14 @@ impl Window {
     /// Switch tab with "tab" key and move with "hjkl".
     /// Reading arrow keys is not supported.
     pub fn show(&mut self) {
-        let mut index = 0;
-        let mut input = 0;
+        let mut index: usize = 0;
+        let mut scroll: usize = 0;
+        let mut input: u8 = 0;
         self.refresh();
 
         loop {
             clear();
+            let content = self.tabs[index].build();
 
             // println!("{}", input);
             if input == 9 {
@@ -73,8 +75,17 @@ impl Window {
                 } else {
                     index = 0;
                 }
+                scroll = 0;
             } else if input == 113 {
                 break;
+            } else if input == 106 {
+                if scroll < content.len() - self.height as usize + 3 {
+                    scroll = scroll + 1;
+                }
+            } else if input == 107 {
+                if scroll > 0 {
+                    scroll = scroll - 1;
+                }
             }
 
             let headline = self.get_headline(index);
@@ -88,8 +99,6 @@ impl Window {
             if required_h > self.height as usize {
                 panic!("Height is too short!")
             }
-
-            let content = self.tabs[index].build();
 
             for i in 0..self.height {
                 for j in 0..self.width {
@@ -119,7 +128,7 @@ impl Window {
                         if j == 0 || j == self.width - 1 {
                             print!("│")
                         } else {
-                            if let Some(line) = content.get((i - 1) as usize) {
+                            if let Some(line) = content.get((i - 1 + scroll as u16) as usize) {
                                 if let Some(ch) = line.chars().nth((j - 1) as usize) {
                                     print!("{}", ch);
                                 } else {

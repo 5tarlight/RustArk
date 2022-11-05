@@ -16,7 +16,7 @@ fn main() {
     let mut window = Window::new(size.0, size.1);
 
     window.add_tab(String::from("Main"));
-    window.tabs[0].set_content(String::from("Hello Worldsadfasdfhkasdfkhasfashfaskdhfjjjjjjjjjasdfljksajklkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkasdfoiuasdfoipuqwriopuwprouasdflnasdflkasjflasjdflaksfjalkdfjaslfjalsfkdj"));
+    window.tabs[0].set_content(String::from("1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n0\n"));
     window.add_tab(String::from("Inventory"));
     window.tabs[1].set_content(String::from("Hello World from inventory"));
     window.show();
